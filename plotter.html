@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>Just plot my Scatter plot</title>
+</head>
+<body style="margin: 0">
+    <div class="masterContainer" style="background-color: rgba(0, 0, 0, 0.01); font-family: monospace; text-align: center; height: calc(100vh - 32px)">
+        <h1>Just plot the Scatter plot</h1>
+        <div class="canvasContainer" style="display: flex; justify-content: center">
+            <canvas id="graphCanvas" style="border: 1px dashed black; margin-top: 10px; background-color: white"></canvas>
+        </div>
+
+        <p class="coordinate" style="display: none"></p>
+        <section class="dimInputContainer" style="display: flex; justify-content: space-evenly; margin-top: 10px; font-size: 16px">
+            <div class="graphWidthInputContainer">
+                <label for="graphWidth">Graph Width: </label>
+                <input type="number" value="500" id="graphWidth">
+            </div>
+            <div class="graphHeightInputContainer">
+                <label for="graphHeight">Graph Height: </label>
+                <input type="number" value="500" id="graphHeight">
+            </div>
+        </section>
+        <div class="buttonContainer" style="display: flex; justify-content: center; margin-top: 10px">
+            <input style="text-align: center" type="button" value="Export" onclick="exportCoordinates()">
+        </div>
+
+        <div class="floatingTab" style="background-color: white; position: fixed; border: 1px solid black; pointer-events: none"></div>
+    </div>
+
+    <script>
+        class Arr{
+            constructor() {
+                this.arr = [];
+            }
+            find(point){
+                let found = false;
+                this.arr.forEach(el => {
+                    if(el[0] === point.x && el[1] === point.y){
+                        found = true;
+                    }
+                });
+                return found;
+            }
+        }
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+    </script>
+    <script>
+
+        let graphCanvas = document.querySelector("#graphCanvas");
+        let coordinateP = document.querySelector(".coordinate");
+        let floatingTab = document.querySelector(".floatingTab");
+        graphCanvas.width = 500;
+        graphCanvas.height = 500;
+        let borderWidth = 3;
+        let ctx = graphCanvas.getContext("2d");
+        let coordinatesArr = new Arr();
+        let coordinates = coordinatesArr.arr;
+        let currentCoord = new Point();
+        graphCanvas.style.borderLeft = `${borderWidth}px solid black`;
+        graphCanvas.style.borderBottom = `${borderWidth}px solid black`;
+
+        graphCanvas.onclick = (e) => {
+            if(!coordinatesArr.find(currentCoord) && currentCoord.x >= 0 && currentCoord.y >= 0){
+                coordinates.push([currentCoord.x, currentCoord.y]);
+                drawCircle(currentCoord.x, -currentCoord.y + graphCanvas.clientHeight);
+            }
+        }
+        graphCanvas.onmousemove = (e) => {
+            floatingTab.style.display = "block";
+            currentCoord.x = e.offsetX;
+            currentCoord.y = -(e.offsetY - graphCanvas.clientHeight);
+            coordinateP.innerHTML = `${currentCoord.x}, ${currentCoord.y}`;
+            floatingTab.innerHTML = `${currentCoord.x}, ${currentCoord.y}`;
+            floatingTab.style.top = `${e.clientY-20}px`;
+            floatingTab.style.left = `${e.clientX}px`;
+        }
+        graphCanvas.onmouseout = (e) => {
+            floatingTab.style.display = "none";
+        }
+        window.onkeypress = (e) => {
+            if(e.key === "w") {
+                if(!coordinatesArr.find(currentCoord) && currentCoord.x >= 0 && currentCoord.y >= 0){
+                    coordinates.push([currentCoord.x, currentCoord.y]);
+                    drawCircle(currentCoord.x, -currentCoord.y + graphCanvas.clientHeight);
+                }
+            }
+            else if(e.key === "s") {
+                exportCoordinates();
+            }
+            else if(e.key === "r") {
+                ctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+                coordinates = [];
+            }
+        }
+
+        let graphHeightInput = document.querySelector("#graphHeight");
+        let graphWidthInput = document.querySelector("#graphWidth");
+
+        graphHeightInput.onkeyup = (e) => {
+            let num = parseInt(e.key);
+            if(num) {
+                graphCanvas.height = graphHeightInput.value;
+                updateGraph();
+            }
+        }
+        graphWidthInput.onkeyup = (e) => {
+            let num = parseInt(e.key);
+            if(num) {
+                graphCanvas.width = graphWidthInput.value;
+                updateGraph();
+            }
+        }
+
+        function updateGraph() {
+            ctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            coordinates.forEach((coordinate) => {
+                drawCircle(coordinate[0], -coordinate[1] + graphCanvas.clientHeight);
+            });
+        }
+        function drawCircle(x, y) {
+            ctx.fillStyle = "rgba(130, 106, 22, 0.7)";
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2, true);
+            ctx.stroke();
+            ctx.fill();
+        }
+        function exportCoordinates() {
+            let fileName = "coords.json";
+            let result = JSON.stringify(coordinates.filter(coord => coord[0] <= graphCanvas.width && coord[1] <= graphCanvas.height));
+            result = result.replace(/\],\[/g, "\n").replace(/\[|\]/g, "");
+            let a = document.createElement("a");
+            let file = new Blob([result], {type: "application/json"});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+    </script>
+</body>
+</html>
