@@ -1,35 +1,110 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="{% static 'css/bulma.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
     <title>Just plot my Scatter plot</title>
 </head>
 <body style="margin: 0">
-    <div class="masterContainer" style="background-color: rgba(0, 0, 0, 0.01); font-family: monospace; text-align: center; height: calc(100vh - 32px)">
-        <h1>Just plot the Scatter plot</h1>
-        <div class="canvasContainer" style="display: flex; justify-content: center">
-            <canvas id="graphCanvas" style="border: 1px dashed black; margin-top: 10px; background-color: white"></canvas>
-        </div>
-
-        <p class="coordinate" style="display: none"></p>
-        <section class="dimInputContainer" style="display: flex; justify-content: space-evenly; margin-top: 10px; font-size: 16px">
-            <div class="graphWidthInputContainer">
-                <label for="graphWidth">Graph Width: </label>
-                <input type="number" value="500" id="graphWidth">
+    <div class="masterContainer" style="background-color: rgba(0, 0, 0, 0.05); font-family: monospace; text-align: center; height: 100vh">
+        <nav class="navbar" role="navigation" aria-label="main navigation" style="display: flex; align-items: center">
+            <div class="navbar-brand">
+                <a class="navbar-item">
+                    <h2 class="title">Just Make a Scatter Plot</h2>
+                </a>
             </div>
-            <div class="graphHeightInputContainer">
-                <label for="graphHeight">Graph Height: </label>
-                <input type="number" value="500" id="graphHeight">
+            <div class="navbar-menu" style="display: flex;">
+                <div class="navbar-end">
+                    <button class="button is-success is-light" onclick="toggleControlsModal()">Controls [C]</button>
+                </div>
             </div>
-        </section>
-        <div class="buttonContainer" style="display: flex; justify-content: center; margin-top: 10px">
-            <input style="text-align: center" type="button" value="Export" onclick="exportCoordinates()">
-        </div>
+        </nav>
+        <div>
+            <div class="modal controlsModal">
+                <div class="modal-background" onclick='document.querySelector(".controlsModal").classList.remove("is-active")'></div>
+                <div class="modal-content" style="min-width: 600px; width: 55vw;">
+                    <section class="section box modalContentBox" style="min-width: 600px; width: 55vw;">
+                        <div class="container">
+                            <h1 class="title">Controls</h1>
+                            <section class="contentBody">
+                                <div class="tableContainer">
+                                    <table class="controlsTable table is-striped is-fullwidth">
+                                        <thead>
+                                            <tr>
+                                                <th>Keys</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="codeBlock" style="padding: 2px 5px">Left Mouse Button</span> or <br><span style="padding: 2px 5px" class="codeBlock">Mouse over graph + W</span></td>
+                                                <td>Creates data point</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="codeBlock">R</span></td>
+                                                <td>Clears graph</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="codeBlock">S</span></td>
+                                                <td>Opens file dialog to save visible data points to JSON file</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="codeBlock">C</span></td>
+                                                <td>Toggle controls modal</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+                <button class="modal-close is-large"
+                        onclick='document.querySelector(".controlsModal").classList.remove("is-active")'
+                        aria-label="close"></button>
+            </div>
+            <div class="canvasContainer" style="display: flex; justify-content: center">
+                <canvas id="graphCanvas" style="border: 1px dashed black; margin-top: 10px; background-color: white"></canvas>
+            </div>
 
-        <div class="floatingTab" style="background-color: white; position: fixed; border: 1px solid black; pointer-events: none"></div>
+            <p class="coordinate" style="display: none"></p>
+            <section class="dimInputContainer" style="display: flex; justify-content: center; margin-top: 10px; font-size: 16px">
+                <div class="graphWidthInputContainer" style="margin-right: 10px">
+                    <label for="graphWidth">Graph Width: </label>
+                    <input type="number" value="500" id="graphWidth">
+                </div>
+                <div class="graphHeightInputContainer">
+                    <label for="graphHeight">Graph Height: </label>
+                    <input type="number" value="500" id="graphHeight">
+                </div>
+            </section>
+            <div class="buttonContainer" style="display: flex; justify-content: center; margin-top: 10px">
+                <input class="button is-success" style="text-align: center" type="button" value="Export [C]" onclick="exportCoordinates()">
+            </div>
+        </div>
+        <div class="floatingTab" style="z-index: 1000; background-color: white; position: fixed; border: 1px solid black; pointer-events: none"></div>
     </div>
-
+    <script>
+        function toggleControlsModal() {
+            let controlsModal = document.querySelector(".controlsModal");
+            controlsModal.classList.add("is-active");
+        }
+        document.onkeypress = (e) => {
+            // Press C to toggle interesting points visibility
+            if(e.key === "c") {
+                if(document.querySelector(".controlsModal").classList.contains("is-active")){
+                    document.querySelector(".controlsModal").classList.remove("is-active");
+                }
+                else{
+                    document.querySelector(".controlsModal").classList.add("is-active");
+                    toggleControlsModal();
+                }
+            }
+        }
+    </script>
     <script>
         class Arr{
             constructor() {
