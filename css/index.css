@@ -1,0 +1,21 @@
+.codeBlock {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand > .navbar-item > .title {
+    font-family: monospace !important;
+}
+
+.navbar-menu {
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+    margin: auto 10px;
+    font-family: monospace !important;
+}
+
+.navbar-end > .button {
+    margin: 0 5px;
+    font-family: monospace;
+}
