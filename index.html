@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <link href="css/bulma.min.css" rel="stylesheet">
-    <link href="css/index.css" rel="stylesheet">
+    <link href="{% static 'css/bulma.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
     <title>Just plot my Scatter plot</title>
 </head>
 <body style="margin: 0">
@@ -180,17 +181,13 @@
 
         graphHeightInput.onkeyup = (e) => {
             let num = parseInt(e.key);
-            if(num) {
-                graphCanvas.height = graphHeightInput.value;
-                updateGraph();
-            }
+            graphCanvas.height = graphHeightInput.value;
+            updateGraph();
         }
         graphWidthInput.onkeyup = (e) => {
             let num = parseInt(e.key);
-            if(num) {
-                graphCanvas.width = graphWidthInput.value;
-                updateGraph();
-            }
+            graphCanvas.width = graphWidthInput.value;
+            updateGraph();
         }
 
         function updateGraph() {
@@ -207,11 +204,11 @@
             ctx.fill();
         }
         function exportCoordinates() {
-            let fileName = "coords.json";
+            let fileName = "coords.csv";
             let result = JSON.stringify(coordinates.filter(coord => coord[0] <= graphCanvas.width && coord[1] <= graphCanvas.height));
             result = result.replace(/\],\[/g, "\n").replace(/\[|\]/g, "");
             let a = document.createElement("a");
-            let file = new Blob([result], {type: "application/json"});
+            let file = new Blob([result], {type: "text/csv"});
             a.href = URL.createObjectURL(file);
             a.download = fileName;
             a.click();
